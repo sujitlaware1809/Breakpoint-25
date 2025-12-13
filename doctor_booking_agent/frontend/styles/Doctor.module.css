@@ -1,0 +1,352 @@
+/* Professional Shadcn-style UI */
+
+.container {
+  min-height: 100vh;
+  background: #fafafa;
+  padding: 0;
+}
+
+.loginBox {
+  max-width: 400px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.loginBox h1 {
+  text-align: center;
+  color: #0a0a0a;
+  margin-bottom: 8px;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.loginBox input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s;
+  background: white;
+  color: #0a0a0a;
+}
+
+.loginBox input:focus {
+  outline: none;
+  border-color: #0a0a0a;
+  box-shadow: 0 0 0 1px #0a0a0a;
+}
+
+.loginBox button {
+  width: 100%;
+  padding: 10px 16px;
+  background: #0a0a0a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.loginBox button:hover {
+  background: #171717;
+}
+
+.loginBox button:disabled {
+  background: #a3a3a3;
+  cursor: not-allowed;
+}
+
+.error {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  text-align: center;
+  font-size: 14px;
+  border: 1px solid #fee2e2;
+}
+
+.hint {
+  text-align: center;
+  color: #737373;
+  font-size: 13px;
+  margin-top: 16px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 16px 32px;
+  margin: 0;
+  border-bottom: 1px solid #e5e5e5;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header h1 {
+  margin: 0;
+  color: #0a0a0a;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.header p {
+  margin: 4px 0 0 0;
+  color: #737373;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.logoutBtn {
+  padding: 8px 16px;
+  background: white;
+  color: #0a0a0a;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+  background: #fafafa;
+  border-color: #d4d4d4;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: #fafafa;
+  min-height: calc(100vh - 73px);
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+}
+
+.section {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.section h2 {
+  margin: 0 0 20px 0;
+  color: #0a0a0a;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.section h3 {
+  margin: 20px 0 12px 0;
+  color: #0a0a0a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.availabilityControls {
+  margin-bottom: 20px;
+}
+
+.toggleBtn {
+  padding: 8px 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+
+.toggleBtn:hover {
+  background: #fafafa;
+  border-color: #d4d4d4;
+}
+
+.slotForm {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.slotForm input,
+.slotForm select {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+}
+
+.slotForm input:focus,
+.slotForm select:focus {
+  outline: none;
+  border-color: #0a0a0a;
+  box-shadow: 0 0 0 1px #0a0a0a;
+}
+
+.slotForm button {
+  padding: 8px 16px;
+  background: #0a0a0a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.slotForm button:hover {
+  background: #171717;
+}
+
+.slotsList {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.slotItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border: 1px solid #f5f5f5;
+}
+
+.slotItem span {
+  color: #0a0a0a;
+  font-size: 14px;
+}
+
+.deleteBtn {
+  padding: 6px 12px;
+  background: white;
+  color: #dc2626;
+  border: 1px solid #e5e5e5;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.appointmentsList {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.appointmentCard {
+  background: #fafafa;
+  padding: 16px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  border: 1px solid #f5f5f5;
+  transition: all 0.2s;
+}
+
+.appointmentCard:hover {
+  background: white;
+  border-color: #e5e5e5;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.aptHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.aptHeader strong {
+  color: #0a0a0a;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.status {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status.scheduled {
+  background: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #dbeafe;
+}
+
+.status.completed {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #dcfce7;
+}
+
+.status.cancelled {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+}
+
+.aptDetails {
+  font-size: 14px;
+  color: #525252;
+  line-height: 1.6;
+}
+
+.aptDetails p {
+  margin: 6px 0;
+}
+
+.aptDetails strong {
+  color: #0a0a0a;
+  font-weight: 500;
+}
+
+.noData {
+  text-align: center;
+  color: #a3a3a3;
+  padding: 40px;
+  font-size: 14px;
+}
