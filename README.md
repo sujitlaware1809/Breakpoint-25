@@ -9,9 +9,8 @@
 
 ## Important
 - The post call evaluation json has to be of a specific format
+- system tools available (end_call and session_notes) that cna we called via the tool names in respetive json. dont forget to pass required keys
 - various vad settings you cna test out
-- our preliminary design
-
 ## Timing Comparison
 
 | Engine    | Start   | End   | Character         |
