@@ -4,6 +4,7 @@ Patient Portal + Doctor Dashboard + Admin Panel
 """
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
+from flask_compress import Compress
 from models import db, Doctor, Patient, Appointment, CallLog, DoctorAvailability
 from src.agent import DoctorBookingAgent
 from datetime import datetime, date, timedelta
@@ -13,16 +14,43 @@ import secrets
 
 app = Flask(__name__)
 CORS(app)
+Compress(app)  # Enable gzip compression for faster response times
 
-# Database configuration
+# Database configuration with performance optimizations
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///hospital_booking.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_size': 10,
+    'pool_recycle': 3600,
+    'pool_pre_ping': True,
+    'max_overflow': 20
+}
 app.config['SECRET_KEY'] = secrets.token_hex(16)
+app.config['JSON_SORT_KEYS'] = False  # Faster JSON serialization
 
 db.init_app(app)
 
 # Initialize agent
 agent = DoctorBookingAgent()
+
+# SMS Confirmation Helper
+def send_sms_confirmation(phone, appointment_data):
+    """Send SMS confirmation (mock implementation - integrate with Twilio/SMS service)"""
+    message = f"""Appointment Confirmed!
+
+Patient: {appointment_data['patient_name']}
+Doctor: {appointment_data['doctor_name']} ({appointment_data['specialty']})
+Date: {appointment_data['date']}
+Time: {appointment_data['time']}
+Confirmation: {appointment_data['confirmation']}
+
+Arrive 10 min early. Call to reschedule.
+- Hospital Booking System"""
+    
+    # TODO: Integrate with SMS gateway (Twilio, Nexmo, etc.)
+    print(f"[SMS] Sending to {phone}:")
+    print(message)
+    return True
 
 # Create tables
 with app.app_context():
@@ -175,8 +203,14 @@ def get_doctor(doctor_id):
 
 @app.route('/api/doctor/<int:doctor_id>/appointments', methods=['GET'])
 def get_doctor_appointments(doctor_id):
-    """Get all appointments for a doctor"""
-    appointments = Appointment.query.filter_by(doctor_id=doctor_id).order_by(Appointment.appointment_date.desc()).all()
+    """Get all appointments for a doctor - optimized with eager loading"""
+    from sqlalchemy.orm import joinedload
+    
+    appointments = (Appointment.query
+                   .options(joinedload(Appointment.patient))
+                   .filter_by(doctor_id=doctor_id)
+                   .order_by(Appointment.appointment_date.desc())
+                   .all())
     
     return jsonify({
         'status': 'success',
@@ -211,7 +245,7 @@ def book_appointment():
             db.session.flush()
         
         # Get doctor
-        doctor = Doctor.query.get(data['doctor_id'])
+        doctor = db.session.get(Doctor, data['doctor_id'])
         if not doctor:
             return jsonify({'error': 'Doctor not found'}), 404
         
@@ -260,6 +294,16 @@ def book_appointment():
             appointment.call_status = 'initiated'
             
             db.session.commit()
+            
+            # Send SMS confirmation (simulated - implement with Twilio/SMS gateway)
+            send_sms_confirmation(patient.phone, {
+                'patient_name': patient.name,
+                'doctor_name': doctor.name,
+                'specialty': doctor.specialty,
+                'date': appointment_date,
+                'time': appointment_time,
+                'confirmation': confirmation_num
+            })
         
         return jsonify({
             'appointment_id': appointment.id,
@@ -628,7 +672,7 @@ def sync_call_results(call_id):
         if not call_log or not call_log.appointment_id:
             return jsonify({'error': 'Call or appointment not found'}), 404
         
-        appointment = Appointment.query.get(call_log.appointment_id)
+        appointment = db.session.get(Appointment, call_log.appointment_id)
         if not appointment:
             return jsonify({'error': 'Appointment not found'}), 404
         

@@ -44,26 +44,29 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
+      <div className={styles.header}>
+        <div className={styles.logo}>HealthCare</div>
+        <a href="/doctor-login" className={styles.doctorLink}>Doctor Login</a>
+      </div>
       <div className={styles.main}>
-        <h1>Doctor Appointment Booking</h1>
-        <p className={styles.subtitle}>Schedule your appointment via voice call</p>
+        <h1>Book Appointment</h1>
+        <p className={styles.subtitle}>Schedule via voice call</p>
 
         {callId ? (
           <div className={styles.success}>
-            <h2>Call Initiated Successfully!</h2>
+            <h3>Call Initiated</h3>
             <p>Call ID: <strong>{callId}</strong></p>
-            <p>You will receive a call shortly on {phoneNumber}</p>
+            <p>You will receive a call shortly</p>
             <button 
-              className={styles.button}
               onClick={() => setCallId(null)}
             >
-              Book Another Appointment
+              Book Another
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formGroup}>
-              <label>Phone Number *</label>
+              <label>Phone Number</label>
               <input
                 type="tel"
                 placeholder="+91XXXXXXXXXX"
@@ -85,12 +88,18 @@ export default function Home() {
 
             <div className={styles.formGroup}>
               <label>Specialty (Optional)</label>
-              <input
-                type="text"
-                placeholder="General Medicine"
+              <select
                 value={specialty}
                 onChange={(e) => setSpecialty(e.target.value)}
-              />
+              >
+                <option value="">Select specialty</option>
+                <option value="General Medicine">General Medicine</option>
+                <option value="Cardiology">Cardiology</option>
+                <option value="Dermatology">Dermatology</option>
+                <option value="Orthopedics">Orthopedics</option>
+                <option value="Pediatrics">Pediatrics</option>
+                <option value="ENT">ENT</option>
+              </select>
             </div>
 
             {error && <div className={styles.error}>{error}</div>}

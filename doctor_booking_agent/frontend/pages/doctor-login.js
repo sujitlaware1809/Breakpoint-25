@@ -59,6 +59,16 @@ export default function DoctorLogin() {
 
   const fetchAppointments = async (doctorId) => {
     try {
+      // Check cache first (5 minute TTL)
+      const cacheKey = `appointments_${doctorId}`;
+      const cached = sessionStorage.getItem(cacheKey);
+      const cacheTime = sessionStorage.getItem(`${cacheKey}_time`);
+      
+      if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < 300000) {
+        setAppointments(JSON.parse(cached));
+        return;
+      }
+
       const response = await fetch(`${API_URL}/api/doctor/${doctorId}/appointments`);
       const data = await response.json();
       if (data.status === 'success') {
@@ -72,6 +82,10 @@ export default function DoctorLogin() {
           })
         }));
         setAppointments(formattedAppointments);
+        
+        // Cache the results
+        sessionStorage.setItem(cacheKey, JSON.stringify(formattedAppointments));
+        sessionStorage.setItem(`${cacheKey}_time`, Date.now().toString());
       }
     } catch (err) {
       console.error('Failed to fetch appointments:', err);
@@ -159,30 +173,44 @@ export default function DoctorLogin() {
   if (!isLoggedIn) {
     return (
       <div className={styles.container}>
+        <div className={styles.header}>
+          <div className={styles.logo}>HealthCare</div>
+          <a href="/" className={styles.homeLink}>Patient Booking</a>
+        </div>
         <div className={styles.loginBox}>
-          <h1>👨‍⚕️ Doctor Login</h1>
+          <div className={styles.loginImage}>
+            <img src="/docter.png" alt="Doctor" />
+          </div>
+          <h1>Doctor Portal</h1>
+          <p className={styles.welcome}>Sign in to manage your appointments</p>
           {error && <div className={styles.error}>{error}</div>}
           <form onSubmit={handleLogin}>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className={styles.formGroup}>
+              <label>Email</label>
+              <input
+                type="email"
+                placeholder="doctor@hospital.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Password</label>
+              <input
+                type="password"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
             <button type="submit" disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
           <p className={styles.hint}>
-            Default: rajkumar@hospital.com / password123
+            Test: rajkumar@hospital.com / password123
           </p>
         </div>
       </div>
@@ -192,9 +220,10 @@ export default function DoctorLogin() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div>
-          <h1>Dr. {doctor.name}</h1>
-          <p>{doctor.specialty} • {doctor.clinic_name}</p>
+        <div className={styles.logo}>HealthCare</div>
+        <div className={styles.doctorInfo}>
+          <span>Dr. {doctor.name}</span>
+          <span className={styles.specialty}>{doctor.specialty}</span>
         </div>
         <button onClick={handleLogout} className={styles.logoutBtn}>Logout</button>
       </div>
@@ -202,32 +231,34 @@ export default function DoctorLogin() {
       <div className={styles.dashboard}>
         {/* Availability Section */}
         <div className={styles.section}>
-          <h2>⏰ Manage Availability</h2>
-          <div className={styles.availabilityControls}>
+          <div className={styles.sectionHeader}>
+            <h2>Availability</h2>
             <button onClick={toggleAvailability} className={styles.toggleBtn}>
-              {doctor.is_available ? '🟢 Available' : '🔴 Unavailable'}
+              {doctor.is_available ? '✓ Available' : '○ Unavailable'}
             </button>
           </div>
 
           <form onSubmit={addAvailabilitySlot} className={styles.slotForm}>
-            <input
-              type="date"
-              value={newSlotDate}
-              onChange={(e) => setNewSlotDate(e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
-              required
-            />
-            <select value={newSlotTime} onChange={(e) => setNewSlotTime(e.target.value)}>
-              <option>9:00 AM</option>
-              <option>10:00 AM</option>
-              <option>11:00 AM</option>
-              <option>12:00 PM</option>
-              <option>2:00 PM</option>
-              <option>3:00 PM</option>
-              <option>4:00 PM</option>
-              <option>5:00 PM</option>
-            </select>
-            <button type="submit">+ Add Slot</button>
+            <div className={styles.inputGroup}>
+              <input
+                type="date"
+                value={newSlotDate}
+                onChange={(e) => setNewSlotDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                required
+              />
+              <select value={newSlotTime} onChange={(e) => setNewSlotTime(e.target.value)}>
+                <option>9:00 AM</option>
+                <option>10:00 AM</option>
+                <option>11:00 AM</option>
+                <option>12:00 PM</option>
+                <option>2:00 PM</option>
+                <option>3:00 PM</option>
+                <option>4:00 PM</option>
+                <option>5:00 PM</option>
+              </select>
+            </div>
+            <button type="submit">Add Slot</button>
           </form>
 
           <div className={styles.slotsList}>
@@ -245,7 +276,10 @@ export default function DoctorLogin() {
 
         {/* Appointments Section */}
         <div className={styles.section}>
-          <h2>📅 Appointments ({appointments.length})</h2>
+          <div className={styles.sectionHeader}>
+            <h2>Appointments</h2>
+            <span className={styles.badge}>{appointments.length}</span>
+          </div>
           <div className={styles.appointmentsList}>
             {appointments.length === 0 ? (
               <p className={styles.noData}>No appointments scheduled</p>
@@ -259,14 +293,14 @@ export default function DoctorLogin() {
                     </span>
                   </div>
                   <div className={styles.aptDetails}>
-                    <p><strong>📅 Date:</strong> {apt.appointment_date}</p>
-                    <p><strong>🕐 Time:</strong> {apt.appointment_time}</p>
-                    <p><strong>📞 Phone:</strong> {apt.patient_phone}</p>
-                    {apt.reason && <p><strong>💬 Reason:</strong> {apt.reason}</p>}
-                    {apt.symptoms && <p><strong>🩺 Symptoms:</strong> {apt.symptoms}</p>}
-                    {apt.special_notes && <p><strong>📝 Notes:</strong> {apt.special_notes}</p>}
-                    <p><strong>🔖 Confirmation:</strong> {apt.confirmation_number}</p>
-                    {apt.call_status && <p><strong>📞 Call:</strong> {apt.call_status}</p>}
+                    <p><strong>Date:</strong> {apt.appointment_date}</p>
+                    <p><strong>Time:</strong> {apt.appointment_time}</p>
+                    <p><strong>Phone:</strong> {apt.patient_phone}</p>
+                    {apt.reason && <p><strong>Reason:</strong> {apt.reason}</p>}
+                    {apt.symptoms && <p><strong>Symptoms:</strong> {apt.symptoms}</p>}
+                    {apt.special_notes && <p><strong>Notes:</strong> {apt.special_notes}</p>}
+                    <p><strong>Confirmation:</strong> {apt.confirmation_number}</p>
+                    {apt.call_status && <p><strong>Call Status:</strong> {apt.call_status}</p>}
                   </div>
                 </div>
               ))
