@@ -14,12 +14,12 @@ This repository contains the **Doctor Booking Agent**, an AI-driven system that 
 ### Dashboard Views
 | Doctor Dashboard | Admin Panel |
 | ---------------- | ----------- |
-| ![Doctor Dashboard](https://via.placeholder.com/400x200?text=Doctor+Dashboard+Screenshot) | ![Admin Panel](https://via.placeholder.com/400x200?text=Admin+Panel+Screenshot) |
+| ![Doctor Dashboard](\doctor_booking_agent\frontend\public\dco2.jpg) | ![Admin Panel](\doctor_booking_agent\frontend\public\admin1.jpg) |
 
 ### Communication
 | WhatsApp Confirmation | Follow-up Reminder |
 | --------------------- | ------------------ |
-| ![WhatsApp Confirmation](https://via.placeholder.com/300x400?text=WhatsApp+Confirmation) | ![Follow-up Msg](https://via.placeholder.com/300x400?text=Follow-up+Message) |
+| ![WhatsApp Confirmation](\doctor_booking_agent\frontend\public\appiotiment_followup.jpeg) | ![Follow-up Msg](\doctor_booking_agent\frontend\public\appiotiment_followup.jpeg) |
 
 ## Repository Structure
 
