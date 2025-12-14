@@ -5,10 +5,15 @@ Patient Portal + Doctor Dashboard + Admin Panel
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from flask_compress import Compress
-from models import db, Doctor, Patient, Appointment, CallLog, DoctorAvailability
+from models import db, Doctor, Patient, Appointment, CallLog, DoctorAvailability, FollowUpCall
+import sys
+import os
+# Add agent directory to path to allow importing src.agent
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'agent')))
 from src.agent import DoctorBookingAgent
 from datetime import datetime, date, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+from twilio.rest import Client
 import os
 import secrets
 
@@ -51,6 +56,76 @@ Arrive 10 min early. Call to reschedule.
     print(f"[SMS] Sending to {phone}:")
     print(message)
     return True
+
+# WhatsApp Confirmation Helper
+def send_whatsapp_confirmation(phone, appointment_data):
+    """Send WhatsApp confirmation via Twilio"""
+    
+    # Twilio Credentials
+    account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+    auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+    
+    message_body = f"""*Appointment Confirmed!* ✅
+
+👤 *Patient:* {appointment_data['patient_name']}
+👨‍⚕️ *Doctor:* {appointment_data['doctor_name']} ({appointment_data['specialty']})
+📅 *Date:* {appointment_data['date']}
+⏰ *Time:* {appointment_data['time']}
+🔖 *ID:* {appointment_data['confirmation']}
+
+Please arrive 10 min early.
+Reply to this message to reschedule."""
+
+    print(f"\n[WhatsApp] Sending to {phone}...")
+    
+    try:
+        client = Client(account_sid, auth_token)
+        
+        # FOR TESTING: Override recipient to verified number
+        # Ensure phone number has country code (defaulting to +91 if missing for India)
+        # to_number = phone if phone.startswith('+') else f"+91{phone}"
+        to_number = "+919970208412" # Hardcoded for testing
+        
+        message = client.messages.create(
+            from_='whatsapp:+14155238886',  # Twilio Sandbox Number
+            body=message_body,
+            to=f'whatsapp:{to_number}'
+        )
+        print(f"[WhatsApp] Sent successfully to {to_number}! SID: {message.sid}")
+        return True
+    except Exception as e:
+        print(f"[WhatsApp] Failed to send: {str(e)}")
+        return False
+
+def send_whatsapp_reminder(phone, appointment_data):
+    """Send WhatsApp reminder via Twilio"""
+    account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+    auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+    
+    message_body = f"""*Appointment Reminder* 🔔
+
+Hi {appointment_data['patient_name']},
+This is a reminder for your appointment with *{appointment_data['doctor_name']}* ({appointment_data['specialty']}).
+
+📅 *Date:* {appointment_data['date']}
+⏰ *Time:* {appointment_data['time']}
+
+Please reply if you need to reschedule.
+"""
+    print(f"\n[WhatsApp Reminder] Sending to {phone}...")
+    try:
+        client = Client(account_sid, auth_token)
+        to_number = "+919970208412" # Hardcoded for testing
+        message = client.messages.create(
+            from_='whatsapp:+14155238886',
+            body=message_body,
+            to=f'whatsapp:{to_number}'
+        )
+        print(f"[WhatsApp] Sent successfully! SID: {message.sid}")
+        return True
+    except Exception as e:
+        print(f"[WhatsApp] Failed to send: {str(e)}")
+        return False
 
 # Create tables
 with app.app_context():
@@ -222,32 +297,71 @@ def get_doctor_appointments(doctor_id):
             'appointment_time': a.appointment_time,
             'status': a.status,
             'reason': a.reason,
+            'symptoms': a.symptoms,
             'confirmation_number': a.confirmation_number
         } for a in appointments]
     })
 
 # ==================== APPOINTMENT ENDPOINTS ====================
 
+@app.route('/api/booking/initiate', methods=['POST'])
+def initiate_booking_call():
+    """Initiate a booking call from the frontend"""
+    try:
+        data = request.json
+        phone = data.get('phone_number')
+        doctor_info = data.get('doctor_info')
+        
+        if not phone:
+            return jsonify({'status': 'error', 'message': 'Phone number required'}), 400
+
+        # Fetch active doctors for the roster
+        active_doctors = Doctor.query.filter_by(is_available=True).all()
+        roster = []
+        for doc in active_doctors:
+            roster.append({
+                'name': doc.name,
+                'specialty': doc.specialty,
+                'slots': doc.available_time or '9am-5pm'
+            })
+
+        response = agent.create_booking_call(phone, doctor_info, roster)
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @app.route('/api/appointment/book', methods=['POST'])
 def book_appointment():
     """Book an appointment with voice call"""
     try:
         data = request.json
+        phone = data.get('patient_phone') or data.get('phone_number')
+        
+        if not phone:
+            return jsonify({'error': 'Phone number required'}), 400
         
         # Get or create patient
-        patient = Patient.query.filter_by(phone=data['patient_phone']).first()
+        patient = Patient.query.filter_by(phone=phone).first()
         if not patient:
             patient = Patient(
                 name=data.get('patient_name', 'Unknown'),
-                phone=data['patient_phone']
+                phone=phone
             )
             db.session.add(patient)
             db.session.flush()
         
-        # Get doctor
-        doctor = db.session.get(Doctor, data['doctor_id'])
+        # Get doctor (optional - if not provided, pick first available)
+        doctor_id = data.get('doctor_id')
+        if doctor_id:
+            doctor = db.session.get(Doctor, doctor_id)
+        else:
+            doctor = Doctor.query.first()
+            
         if not doctor:
-            return jsonify({'error': 'Doctor not found'}), 404
+            # Create dummy doctor if none exists
+            doctor = Doctor(name="Dr. Sharma", specialty="General Medicine", phone="0000000000")
+            db.session.add(doctor)
+            db.session.flush()
         
         # Create appointment
         confirmation_num = f"APT-{datetime.now().strftime('%Y%m%d%H%M%S')}"
@@ -275,16 +389,28 @@ def book_appointment():
         doctor_info = {
             'name': doctor.name,
             'specialty': doctor.specialty,
-            'clinic': doctor.clinic_name
+            'clinic': doctor.clinic_name,
+            'date': appointment_date,
+            'time': appointment_time
         }
         
-        call_response = agent.create_booking_call(data['patient_phone'], doctor_info)
+        # Fetch active doctors for the roster
+        active_doctors = Doctor.query.filter_by(is_available=True).all()
+        roster = []
+        for doc in active_doctors:
+            roster.append({
+                'name': doc.name,
+                'specialty': doc.specialty,
+                'slots': doc.available_time or '9am-5pm'
+            })
+
+        call_response = agent.create_booking_call(phone, doctor_info, roster)
         
         # Log the call
         if call_response.get('status') == 'success':
             call_log = CallLog(
-                call_id=call_response['data'].get('id'),
-                phone_number=data['patient_phone'],
+                call_id=str(call_response['data'].get('id')),
+                phone_number=phone,
                 appointment_id=appointment.id,
                 status='in_progress'
             )
@@ -665,63 +791,125 @@ def sync_call_results(call_id):
             return jsonify({'error': 'Failed to fetch call details'}), 400
         
         call_data = call_detail['data']
+        
+        # Extract evaluation result from nested structure if necessary
         evaluation_result = call_data.get('evaluation_result', {})
+        if not evaluation_result and 'call_details' in call_data:
+            # Try to find it in callOutcomesData
+            evaluation_result = call_data['call_details'].get('callOutcomesData', {})
+            
+        phone_number = call_data.get('phone_number', 'Unknown')
         
-        # Find the call log and appointment
-        call_log = CallLog.query.filter_by(call_id=call_id).first()
-        if not call_log or not call_log.appointment_id:
-            return jsonify({'error': 'Call or appointment not found'}), 404
+        # 1. Find or Create Patient
+        patient = Patient.query.filter_by(phone=phone_number).first()
+        if not patient:
+            # Try to get name from evaluation, else use "Unknown"
+            patient_name = evaluation_result.get('name', 'New Patient')
+            patient = Patient(name=patient_name, phone=phone_number)
+            db.session.add(patient)
+            db.session.flush() # Get ID
+            
+        # Update patient name if we have a better one now
+        if evaluation_result.get('name') and evaluation_result['name'] != 'Unknown':
+            patient.name = evaluation_result['name']
+
+        # 2. Find or Create CallLog
+        call_log = CallLog.query.filter_by(call_id=str(call_id)).first()
+        if not call_log:
+            call_log = CallLog(
+                call_id=str(call_id),
+                phone_number=phone_number,
+                status=call_data.get('status', 'completed'),
+                duration=call_data.get('duration', 0),
+                recording_url=call_data.get('recording_url'),
+                evaluation_result=evaluation_result
+            )
+            db.session.add(call_log)
+        else:
+            call_log.status = call_data.get('status', 'completed')
+            call_log.duration = call_data.get('duration')
+            call_log.evaluation_result = evaluation_result
+            if call_data.get('recording_url'):
+                call_log.recording_url = call_data.get('recording_url')
+
+        # 3. Find or Create Appointment
+        # If call_log already had an appointment, use it. Otherwise create new.
+        appointment = None
+        if call_log.appointment_id:
+            appointment = db.session.get(Appointment, call_log.appointment_id)
         
-        appointment = db.session.get(Appointment, call_log.appointment_id)
         if not appointment:
-            return jsonify({'error': 'Appointment not found'}), 404
-        
-        # Update patient information from evaluation results
-        patient = appointment.patient
-        
-        # Update patient name if provided in evaluation
-        if evaluation_result.get('patient_name') and evaluation_result['patient_name'] != 'Unknown':
-            patient.name = evaluation_result['patient_name']
-        
-        # Update appointment details
+            # Default doctor (first available or specific one)
+            doctor = Doctor.query.first()
+            if not doctor:
+                # Create a dummy doctor if none exists
+                doctor = Doctor(name="Dr. Sharma", specialty="General Medicine", phone="0000000000")
+                db.session.add(doctor)
+                db.session.flush()
+            
+            appointment = Appointment(
+                patient_id=patient.id,
+                doctor_id=doctor.id,
+                appointment_date=date.today() + timedelta(days=1), # Default tomorrow
+                appointment_time="10:00 AM", # Default time
+                call_id=str(call_id),
+                status='pending'
+            )
+            db.session.add(appointment)
+            db.session.flush()
+            call_log.appointment_id = appointment.id
+
+        # 4. Update Appointment from Evaluation
         if evaluation_result.get('symptoms'):
             appointment.symptoms = evaluation_result['symptoms']
         
-        if evaluation_result.get('special_notes'):
-            appointment.special_notes = evaluation_result['special_notes']
-        
-        # Update doctor if specialty changed
-        if evaluation_result.get('specialty_needed'):
-            specialty = evaluation_result['specialty_needed']
+        if evaluation_result.get('specialty'):
+            specialty = evaluation_result['specialty']
             # Try to find a doctor with matching specialty
-            matching_doctor = Doctor.query.filter_by(specialty=specialty, is_available=True).first()
+            matching_doctor = Doctor.query.filter(Doctor.specialty.ilike(f"%{specialty}%")).first()
             if matching_doctor:
                 appointment.doctor_id = matching_doctor.id
         
-        # Update appointment time if provided
-        if evaluation_result.get('appointment_date'):
-            try:
-                appointment.appointment_date = datetime.strptime(
-                    evaluation_result['appointment_date'], '%Y-%m-%d'
-                ).date()
-            except:
-                pass
-        
-        if evaluation_result.get('appointment_time'):
-            appointment.appointment_time = evaluation_result['appointment_time']
-        
-        # Update call log
-        call_log.status = call_data.get('status', 'completed')
-        call_log.duration = call_data.get('duration')
-        call_log.evaluation_result = str(evaluation_result)
-        
-        # Update appointment status
-        if evaluation_result.get('appointment_confirmed') == True:
+        if evaluation_result.get('time'):
+            appointment.appointment_time = evaluation_result['time']
+            
+        if evaluation_result.get('booked') == True:
             appointment.status = 'confirmed'
             appointment.call_status = 'completed'
-        else:
-            appointment.status = 'pending'
-        
+            
+            # Generate confirmation number if not exists
+            if not appointment.confirmation_number:
+                appointment.confirmation_number = f"APT-{appointment.id}-{secrets.token_hex(4).upper()}"
+
+            # Send SMS Confirmation
+            appointment_data = {
+                'patient_name': patient.name,
+                'doctor_name': appointment.doctor.name,
+                'specialty': appointment.doctor.specialty,
+                'date': str(appointment.appointment_date),
+                'time': appointment.appointment_time,
+                'confirmation': appointment.confirmation_number
+            }
+            send_sms_confirmation(patient.phone, appointment_data)
+            send_whatsapp_confirmation(patient.phone, appointment_data)
+            
+            # Schedule Follow-up Calls (1 hour and 2 hours later)
+            now = datetime.utcnow()
+            follow_up_1 = FollowUpCall(
+                appointment_id=appointment.id,
+                scheduled_time=now + timedelta(hours=1),
+                type='whatsapp',
+                status='pending'
+            )
+            follow_up_2 = FollowUpCall(
+                appointment_id=appointment.id,
+                scheduled_time=now + timedelta(hours=2),
+                type='call',
+                status='pending'
+            )
+            db.session.add(follow_up_1)
+            db.session.add(follow_up_2)
+
         db.session.commit()
         
         return jsonify({
@@ -732,8 +920,7 @@ def sync_call_results(call_id):
                 'doctor': appointment.doctor.name,
                 'specialty': appointment.doctor.specialty,
                 'symptoms': appointment.symptoms,
-                'appointment_date': appointment.appointment_date.isoformat(),
-                'appointment_time': appointment.appointment_time
+                'status': appointment.status
             }
         }), 200
         

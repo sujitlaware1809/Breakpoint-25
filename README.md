@@ -1,37 +1,55 @@
-# How to use the proxy server
+# Doctor Appointment Booking Voice AI Agent (Breakpoint-25)
 
-## Register
-- whitelist a non DND phone number and get Auth token
+> **A Next-Gen Healthcare Booking System powered by Voice AI.**
 
-## Makefile and Postman
-- Query the call server for actions and info
-- Postman Documentation - https://documenter.getpostman.com/view/29008927/2sB3dSQUQE
+This repository contains the **Doctor Booking Agent**, an AI-driven system that automates patient appointment confirmations and symptom checking.
 
-## Important
-- The post call evaluation json has to be of a specific format
-- system tools available (end_call and session_notes) that cna we called via the tool names in respetive json. dont forget to pass required keys
-- various vad settings you cna test out
-## Timing Comparison
+## Key Features
 
-| Engine    | Start   | End   | Character         |
-| --------- | ------- | ----- | ----------------- |
-| LOKEN     | instant | 100ms | Responsive        |
-| KAAN      | 50ms    | 550ms | Aggressive        |
-| POLUX     | 128ms   | 160ms | Balanced          |
-| ANCHORITE | 200ms   | 800ms | Patient           |
-| CALGAR    | 50ms    | 400ms | Fast-in, slow-out |
-| VALDOR    | 50ms    | 400ms | Fast-in, slow-out |
-| CAWL      | 50ms    | 400ms | Fast-in, slow-out |
+- **WhatsApp Booking**: Seamless integration for booking appointments via WhatsApp.
+- **Multilingual Support**: AI agent capable of conversing in multiple languages.
+- **Smart Follow-ups**: Automated reminder calls scheduled 1 hour and 2 hours before appointments.
 
-## When to Use What
+## Repository Structure
 
-| Engine        | Use Case                                        |
-| ------------- | ----------------------------------------------- |
-| **LOKEN**     | Testing, baseline, clean audio                  |
-| **KAAN**      | Need fastest response, accept false triggers    |
-| **POLUX**     | Noisy environment, need stability               |
-| **ANCHORITE** | Very conservative, minimize interruptions       |
-| **CALGAR**    | Good all-rounder for telephony (no native deps) |
-| **VALDOR**    | **Production default** - best balance           |
-| **CAWL**      | Maximum performance, have native libs           |
+- **`doctor_booking_agent/`**: The main application code (Frontend + Backend + Agent Logic).
+  - See [Application Documentation](doctor_booking_agent/README.md) for setup and usage.
+- **`prompts/`**: Contains the system prompts and templates used by the AI.
+  - `english.txt`: The base persona text.
+  - `prompt.txt`: The active XML-based system prompt.
+  - `evaluationTool.json`: The schema for call evaluation and data extraction.
+- **`evaluationTool.json`**: Reference copy of the evaluation schema.
+- **`endCall.js` / `sessionNotes.js`**: Helper scripts for call management.
+
+## Quick Start
+
+To run the full application (Frontend and Backend), navigate to the application folder:
+
+```bash
+cd doctor_booking_agent
+# Follow instructions in doctor_booking_agent/README.md
+```
+
+## Configuration Reference
+
+### Call Evaluation Schema
+The agent uses a specific JSON schema to evaluate calls and extract booking details. See `prompts/evaluationTool.json` for the definition.
+
+### Voice Activity Detection (VAD) Settings
+The following VAD engines are supported for the voice agent:
+
+| Engine    | Start   | End   | Character         | Use Case |
+| --------- | ------- | ----- | ----------------- | -------- |
+| **LOKEN**     | instant | 100ms | Responsive        | Testing, baseline, clean audio |
+| **KAAN**      | 50ms    | 550ms | Aggressive        | Need fastest response, accept false triggers |
+| **POLUX**     | 128ms   | 160ms | Balanced          | Noisy environment, need stability |
+| **ANCHORITE** | 200ms   | 800ms | Patient           | Very conservative, minimize interruptions |
+| **CALGAR**    | 50ms    | 400ms | Fast-in, slow-out | Good all-rounder for telephony |
+| **VALDOR**    | 50ms    | 400ms | Fast-in, slow-out | **Production default** - best balance |
+| **CAWL**      | 50ms    | 400ms | Fast-in, slow-out | Maximum performance, have native libs |
+
+## Tools and Scripts
+
+- **Makefile**: Contains commands to query the call server.
+- **Postman Collection**: [View Documentation](https://documenter.getpostman.com/view/29008927/2sB3dSQUQE)
 

@@ -104,3 +104,14 @@ class DoctorAvailability(db.Model):
     max_patients = db.Column(db.Integer, default=1)  # Patients per slot
     
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class FollowUpCall(db.Model):
+    """Model to schedule follow-up calls"""
+    __tablename__ = 'follow_up_calls'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointments.id'), nullable=False)
+    scheduled_time = db.Column(db.DateTime, nullable=False)
+    type = db.Column(db.String(20), default='call') # call, whatsapp
+    status = db.Column(db.String(20), default='pending')  # pending, completed, failed
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

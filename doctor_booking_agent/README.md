@@ -1,121 +1,135 @@
 # Doctor Appointment Booking Voice AI Agent
 
-A voice AI agent for scheduling doctor appointments using Dinodial Proxy API and Google Gemini for intelligent response generation.
+> **A Next-Gen Healthcare Booking System powered by Voice AI, Real-time Sync, and Modern Web Technologies.**
+
+![Status](https://img.shields.io/badge/Status-Active-success)
+![Tech](https://img.shields.io/badge/Stack-Next.js%20|%20Flask%20|%20Python-blue)
+![AI](https://img.shields.io/badge/AI-Dinodial%20Voice%20Agent-purple)
+
+---
+
+## Overview
+
+This project is a complete **Doctor Appointment Booking System** where patients can book appointments via a web portal, and an **AI Voice Agent** immediately calls them to confirm details, check symptoms, and finalize the booking.
+
+The system features a **Real-time Dashboard** for doctors and admins to view appointments as they happen.
+
+### Key Features
+
+*   **AI Voice Receptionist**: Automatically calls patients to confirm bookings using natural language.
+*   **Patient Portal**: Modern, responsive UI for users to request appointments.
+*   **Doctor Dashboard**: Real-time view of appointments, patient details, and symptoms.
+*   **Admin Panel**: Comprehensive overview of hospital stats, doctors, and booking history.
+*   **Real-time Sync**: Call results and transcripts are instantly synced to the database.
+*   **WhatsApp Integration**: Sends booking confirmations via WhatsApp (Twilio).
+
+---
+
+## System Flow
+
+```mermaid
+graph TD
+    A[👤 Patient] -->|1. Enters Details| B(Frontend Portal)
+    B -->|2. API Request| C{Flask Backend}
+    C -->|3. Trigger Call| D[AI Voice Agent]
+    D -->|4. Voice Call| A
+    D -->|5. Sync Results| C
+    C -->|6. Update DB| E[(SQLite Database)]
+    E -->|7. Real-time Update| F[Doctor Dashboard]
+    E -->|8. Real-time Update| G[Admin Panel]
+```
+
+1.  **Booking Request**: Patient submits phone number & preference on the web portal.
+2.  **AI Activation**: Backend triggers the Voice AI Agent.
+3.  **Voice Interaction**: AI calls the patient, confirms availability, and asks about symptoms.
+4.  **Data Sync**: Call outcome (Confirmed/Cancelled, Symptoms) is saved to the database.
+5.  **Dashboard Update**: Doctor sees the new appointment appear instantly.
+
+---
 
 ## Project Structure
 
+The project is organized into three main modules:
+
 ```
 doctor_booking_agent/
-├── src/
-│   ├── __init__.py
-│   ├── dinodial_client.py       # Dinodial API client
-│   ├── gemini_handler.py        # Gemini AI integration
-│   ├── agent.py                 # Main agent logic
-│   └── prompts.py               # AI prompts and evaluation tools
-├── config/                      # Configuration files
-├── prompts/                     # Additional prompt templates
-├── main.py                      # Entry point
-├── requirements.txt             # Python dependencies
-├── .env.example                 # Environment variables template
-└── README.md                    # This file
+├── 📂 frontend/          # Next.js Web Application
+│   ├── pages/            # Patient, Doctor, and Admin pages
+│   └── styles/           # Global CSS and themes
+│
+├── 📂 backend/           # Flask API Server
+│   ├── hospital_api.py   # Main API endpoints
+│   ├── models.py         # Database Schema (SQLAlchemy)
+│   └── instance/         # SQLite Database
+│
+├── 📂 agent/             # AI Logic
+│   ├── src/              # Prompts & Dinodial Client
+│   └── sync_call.py      # Webhook handler for call results
+│
 ```
 
-## Setup
+---
 
-1. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+## Getting Started
 
-2. Create `.env` file from `.env.example`:
-```bash
-cp .env.example .env
-```
-3. Update `.env` with your credentials:
-```
-# Dinodial Configuration
-ADMIN_TOKEN=your_admin_token_here
-DINODIAL_BASE_URL=https://api-dinodial-proxy.cyces.co
-PHONE_NUMBER=your_phone_number
-TOKEN=your_generated_token
+### Prerequisites
 
-# Gemini API Configuration
-GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-pro
-```
+*   **Node.js** (v16+)
+*   **Python** (v3.9+)
+*   **Dinodial/Twilio Credentials** (in `.env`)
 
-### Getting Gemini API Key
-1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Click "Create API Key"
-3. Copy the key to your `.env` file
+### Installation
+
+1.  **Clone the repository**
+    ```bash
+    git clone <repo-url>
+    cd doctor_booking_agent
+    ```
+
+2.  **Backend Setup**
+    ```bash
+    # Create virtual environment
+    python -m venv venv
+    source venv/bin/activate  # or venv\Scripts\activate on Windows
+
+    # Install dependencies
+    pip install -r backend/requirements.txt
+    ```
+
+3.  **Frontend Setup**
+    ```bash
+    cd frontend
+    npm install
+    ```
+
+### Running the Application
+
+We have provided a convenient script to start everything at once:
+
+
+**Manual Start:**
+*   **Backend**: `cd backend && python hospital_api.py` (Port 5000)
+*   **Frontend**: `cd frontend && npm run dev` (Port 3000)
+
+---
 
 ## Usage
 
-Run the agent:
-```bash
-python main.py
-```
+| Portal | URL | Description |
+| :--- | :--- | :--- |
+| **Patient Booking** | [http://localhost:3000](http://localhost:3000) | Book appointments & trigger AI calls. |
+| **Doctor Login** | [http://localhost:3000/doctor-login](http://localhost:3000/doctor-login) | Login to view schedule. <br>*(Default: `dr.raj@hospital.com` / `pass123`)* |
+| **Admin Panel** | [http://localhost:3000/admin](http://localhost:3000/admin) | View hospital statistics and logs. |
 
-## Features
+---
 
-- ✅ Initiate appointment booking calls
-- ✅ **Gemini-powered dynamic response generation**
-- ✅ **Intelligent greeting personalization**
-- ✅ **Context-aware prompts**
-- ✅ Retrieve call history and details
-- ✅ Access call recordings
-- ✅ Structured evaluation of booking outcomes
-- ✅ Multi-language support ready
+## Tech Stack
 
-## API Integration
+*   **Frontend**: Next.js, React, CSS Modules
+*   **Backend**: Flask, SQLAlchemy, SQLite
+*   **AI/Voice**: Dinodial Proxy API, Twilio
+*   **Tools**: Python, Node.js, Axios
 
-### Dinodial Proxy API
-- `POST /api/proxy/make-call/` - Initiate calls
-- `GET /api/proxy/calls/list/` - List calls
-- `GET /api/proxy/call/detail/{id}/` - Get call details
-- `GET /api/proxy/call/recording/{id}/` - Get recordings
+---
 
-### Gemini AI
-- Generates dynamic greetings
-- Creates context-aware availability requests
-- Produces confirmation messages
-- Generates booking prompts
-- Validates appointment data
-
-## Using Gemini with the Agent
-
-```python
-from src.agent import DoctorBookingAgent
-
-agent = DoctorBookingAgent()
-
-# Generate greeting
-greeting = agent.generate_greeting("John Doe")
-
-# Generate availability request
-availability_prompt = agent.generate_availability_request("Dr. Raj Kumar", "General Medicine")
-
-# Generate confirmation
-confirmation = agent.generate_confirmation(
-    "John Doe", 
-    "Dr. Raj Kumar", 
-    "2025-12-20", 
-    "10:00 AM",
-    "APT-12345"
-)
-
-# Generate dynamic booking prompt
-prompt = agent.generate_dynamic_prompt(
-    "John Doe",
-    "Dr. Raj Kumar",
-    "General Medicine",
-    "City Health Clinic"
-)
-```
-
-## Notes
-
-- Rate limit: 1 call per 5 minutes per token (Dinodial)
-- Evaluation tool is blocking - call waits for completion
-- VAD Engine: CAWL (default) or ANCHORITE
-- Gemini responses are customized for voice/speech conversion
+Made with ❤️ for the **Dinodial Hackathon 2025**
