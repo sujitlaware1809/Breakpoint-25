@@ -22,7 +22,7 @@ This repository contains the **Doctor Booking Agent**, an AI-driven system that 
 | :---: | :---: |
 | <img src="doctor_booking_agent/frontend/public/docter.png" width="100%" alt="Doctor Profile" /> | <img src="doctor_booking_agent/frontend/public/admin1.jpg" width="100%" alt="Analytics" /> |
 
-### 📱 WhatsApp Integration
+### WhatsApp Integration
 
 | **Appointment Confirmation** | **Follow-up Reminder** |
 | :---: | :---: |
@@ -36,8 +36,8 @@ This repository contains the **Doctor Booking Agent**, an AI-driven system that 
   - `english.txt`: The base persona text.
   - `prompt.txt`: The active XML-based system prompt.
   - `evaluationTool.json`: The schema for call evaluation and data extraction.
+- **`recordings/`**: Contains top 4 sample call recordings and token compression analysis.
 - **`evaluationTool.json`**: Reference copy of the evaluation schema.
-- **`endCall.js` / `sessionNotes.js`**: Helper scripts for call management.
 ## System Architecture
 
 ```mermaid
