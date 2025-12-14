@@ -10,6 +10,27 @@ This repository contains the **Doctor Booking Agent**, an AI-driven system that 
 - **Multilingual Support**: AI agent capable of conversing in multiple languages.
 - **Smart Follow-ups**: Automated reminder calls scheduled 1 hour and 2 hours before appointments.
 
+
+### Dashboard Views
+| Doctor Dashboard | Admin Panel |
+| ---------------- | ----------- |
+| ![Doctor Dashboard](https://via.placeholder.com/400x200?text=Doctor+Dashboard+Screenshot) | ![Admin Panel](https://via.placeholder.com/400x200?text=Admin+Panel+Screenshot) |
+
+### Communication
+| WhatsApp Confirmation | Follow-up Reminder |
+| --------------------- | ------------------ |
+| ![WhatsApp Confirmation](https://via.placeholder.com/300x400?text=WhatsApp+Confirmation) | ![Follow-up Msg](https://via.placeholder.com/300x400?text=Follow-up+Message) |
+
+## Repository Structure
+
+- **`doctor_booking_agent/`**: The main application code (Frontend + Backend + Agent Logic).
+  - See [Application Documentation](doctor_booking_agent/README.md) for setup and usage.
+- **`prompts/`**: Contains the system prompts and templates used by the AI.
+  - `english.txt`: The base persona text.
+  - `prompt.txt`: The active XML-based system prompt.
+  - `evaluationTool.json`: The schema for call evaluation and data extraction.
+- **`evaluationTool.json`**: Reference copy of the evaluation schema.
+- **`endCall.js` / `sessionNotes.js`**: Helper scripts for call management.
 ## System Architecture
 
 ```mermaid
@@ -36,16 +57,7 @@ graph TD
     Scheduler -->|11. 2hr Reminder| Agent
 ```
 
-## Repository Structure
 
-- **`doctor_booking_agent/`**: The main application code (Frontend + Backend + Agent Logic).
-  - See [Application Documentation](doctor_booking_agent/README.md) for setup and usage.
-- **`prompts/`**: Contains the system prompts and templates used by the AI.
-  - `english.txt`: The base persona text.
-  - `prompt.txt`: The active XML-based system prompt.
-  - `evaluationTool.json`: The schema for call evaluation and data extraction.
-- **`evaluationTool.json`**: Reference copy of the evaluation schema.
-- **`endCall.js` / `sessionNotes.js`**: Helper scripts for call management.
 
 ## Quick Start
 
@@ -79,15 +91,21 @@ The following VAD engines are supported for the voice agent:
 - **Makefile**: Contains commands to query the call server.
 - **Postman Collection**: [View Documentation](https://documenter.getpostman.com/view/29008927/2sB3dSQUQE)
 
-## Gallery
+## 📸 Gallery
 
-### Dashboard Views
-| Doctor Dashboard | Admin Panel |
-| ---------------- | ----------- |
-| ![Doctor Dashboard](https://via.placeholder.com/400x200?text=Doctor+Dashboard+Screenshot) | ![Admin Panel](https://via.placeholder.com/400x200?text=Admin+Panel+Screenshot) |
+### 🖥️ Web Interface
 
-### Communication
-| WhatsApp Confirmation | Follow-up Reminder |
-| --------------------- | ------------------ |
-| ![WhatsApp Confirmation](https://via.placeholder.com/300x400?text=WhatsApp+Confirmation) | ![Follow-up Msg](https://via.placeholder.com/300x400?text=Follow-up+Message) |
+| **Admin Dashboard** | **Doctor Dashboard** |
+| :---: | :---: |
+| <img src="doctor_booking_agent/frontend/public/admin.jpg" width="100%" alt="Admin Dashboard" /> | <img src="doctor_booking_agent/frontend/public/dco2.jpg" width="100%" alt="Doctor Dashboard" /> |
+
+| **Doctor Profile** | **Analytics View** |
+| :---: | :---: |
+| <img src="doctor_booking_agent/frontend/public/docter.png" width="100%" alt="Doctor Profile" /> | <img src="doctor_booking_agent/frontend/public/admin1.jpg" width="100%" alt="Analytics" /> |
+
+### 📱 WhatsApp Integration
+
+| **Appointment Confirmation** | **Follow-up Reminder** |
+| :---: | :---: |
+| <img src="doctor_booking_agent/frontend/public/appiountment_con.jpeg" width="300" alt="WhatsApp Confirmation" /> | <img src="doctor_booking_agent/frontend/public/appiotiment_followup.jpeg" width="300" alt="Follow-up Reminder" /> |
 
