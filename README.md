@@ -11,15 +11,22 @@ This repository contains the **Doctor Booking Agent**, an AI-driven system that 
 - **Smart Follow-ups**: Automated reminder calls scheduled 1 hour and 2 hours before appointments.
 
 
-### Dashboard Views
-| Doctor Dashboard | Admin Panel |
-| ---------------- | ----------- |
-| ![Doctor Dashboard](\doctor_booking_agent\frontend\public\dco2.jpg) | ![Admin Panel](\doctor_booking_agent\frontend\public\admin1.jpg) |
 
-### Communication
-| WhatsApp Confirmation | Follow-up Reminder |
-| --------------------- | ------------------ |
-| ![WhatsApp Confirmation](\doctor_booking_agent\frontend\public\appiotiment_followup.jpeg) | ![Follow-up Msg](\doctor_booking_agent\frontend\public\appiotiment_followup.jpeg) |
+### Web Interface
+
+| **Admin Dashboard** | **Doctor Dashboard** |
+| :---: | :---: |
+| <img src="doctor_booking_agent/frontend/public/admin.jpg" width="100%" alt="Admin Dashboard" /> | <img src="doctor_booking_agent/frontend/public/dco2.jpg" width="100%" alt="Doctor Dashboard" /> |
+
+| **Doctor Profile** | **Analytics View** |
+| :---: | :---: |
+| <img src="doctor_booking_agent/frontend/public/docter.png" width="100%" alt="Doctor Profile" /> | <img src="doctor_booking_agent/frontend/public/admin1.jpg" width="100%" alt="Analytics" /> |
+
+### 📱 WhatsApp Integration
+
+| **Appointment Confirmation** | **Follow-up Reminder** |
+| :---: | :---: |
+| <img src="doctor_booking_agent/frontend/public/appiountment_con.jpeg" width="300" alt="WhatsApp Confirmation" /> | <img src="doctor_booking_agent/frontend/public/appiotiment_followup.jpeg" width="300" alt="Follow-up Reminder" /> |
 
 ## Repository Structure
 
@@ -90,22 +97,4 @@ The following VAD engines are supported for the voice agent:
 
 - **Makefile**: Contains commands to query the call server.
 - **Postman Collection**: [View Documentation](https://documenter.getpostman.com/view/29008927/2sB3dSQUQE)
-
-## 📸 Gallery
-
-### 🖥️ Web Interface
-
-| **Admin Dashboard** | **Doctor Dashboard** |
-| :---: | :---: |
-| <img src="doctor_booking_agent/frontend/public/admin.jpg" width="100%" alt="Admin Dashboard" /> | <img src="doctor_booking_agent/frontend/public/dco2.jpg" width="100%" alt="Doctor Dashboard" /> |
-
-| **Doctor Profile** | **Analytics View** |
-| :---: | :---: |
-| <img src="doctor_booking_agent/frontend/public/docter.png" width="100%" alt="Doctor Profile" /> | <img src="doctor_booking_agent/frontend/public/admin1.jpg" width="100%" alt="Analytics" /> |
-
-### 📱 WhatsApp Integration
-
-| **Appointment Confirmation** | **Follow-up Reminder** |
-| :---: | :---: |
-| <img src="doctor_booking_agent/frontend/public/appiountment_con.jpeg" width="300" alt="WhatsApp Confirmation" /> | <img src="doctor_booking_agent/frontend/public/appiotiment_followup.jpeg" width="300" alt="Follow-up Reminder" /> |
 
