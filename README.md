@@ -26,7 +26,7 @@ This repository contains the **Doctor Booking Agent**, an AI-driven system that 
 
 | **Appointment Confirmation** | **Follow-up Reminder** |
 | :---: | :---: |
-| <img src="doctor_booking_agent/frontend/public/appiountment_con.jpeg" width="300" alt="WhatsApp Confirmation" /> | <img src="doctor_booking_agent/frontend/public/appiotiment_followup.jpeg" width="300" alt="Follow-up Reminder" /> |
+| <img src="doctor_booking_agent/frontend/public/appiountment_con.jpeg" width="200" alt="WhatsApp Confirmation" /> | <img src="doctor_booking_agent/frontend/public/appiotiment_followup.jpeg" width="200" alt="Follow-up Reminder" /> |
 
 ## Repository Structure
 
