@@ -50,6 +50,7 @@ export default async function handler(req, res) {
   }
 }
     
+/*
     <booking_workflow>
         <step1>Greet the patient warmly</step1>
         <step2>Confirm doctor and specialty</step2>
@@ -122,3 +123,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message });
   }
 }
+*/

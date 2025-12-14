@@ -16,7 +16,8 @@ export default function DoctorDashboard() {
 
   const fetchDoctors = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/doctors');
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${backendUrl}/api/doctors`);
       const data = await res.json();
       
       if (data.status === 'success') {
@@ -29,7 +30,8 @@ export default function DoctorDashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/stats/dashboard');
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${backendUrl}/api/stats/dashboard`);
       const data = await res.json();
       
       if (data.status === 'success') {
@@ -44,7 +46,8 @@ export default function DoctorDashboard() {
     setLoading(true);
     setSelectedDoctor(doctorId);
     try {
-      const res = await fetch(`http://localhost:5000/api/doctor/${doctorId}/appointments`);
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${backendUrl}/api/doctor/${doctorId}/appointments`);
       const data = await res.json();
       
       if (data.status === 'success') {

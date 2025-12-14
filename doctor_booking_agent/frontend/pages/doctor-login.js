@@ -10,7 +10,7 @@ export default function DoctorDashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const API_URL = 'http://localhost:5000';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
   // Check login status on mount
   useEffect(() => {

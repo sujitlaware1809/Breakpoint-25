@@ -16,7 +16,8 @@ export default function Admin() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/stats/dashboard');
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${backendUrl}/api/stats/dashboard`);
       const data = await res.json();
       if (data.status === 'success') {
         setStats(data.data);
@@ -28,7 +29,8 @@ export default function Admin() {
 
   const fetchAppointments = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/appointments');
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${backendUrl}/api/appointments`);
       const data = await res.json();
       if (data.status === 'success') {
         setAppointments(data.data);
@@ -40,7 +42,8 @@ export default function Admin() {
 
   const fetchDoctors = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/doctors');
+      const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${backendUrl}/api/doctors`);
       const data = await res.json();
       if (data.status === 'success') {
         setDoctors(data.data);
