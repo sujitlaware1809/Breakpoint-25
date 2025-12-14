@@ -10,6 +10,32 @@ This repository contains the **Doctor Booking Agent**, an AI-driven system that 
 - **Multilingual Support**: AI agent capable of conversing in multiple languages.
 - **Smart Follow-ups**: Automated reminder calls scheduled 1 hour and 2 hours before appointments.
 
+## System Architecture
+
+```mermaid
+graph TD
+    User((Patient))
+    Portal[Frontend Portal]
+    API{Backend API}
+    DB[(Database)]
+    Agent[Voice AI Agent]
+    Scheduler[Scheduler]
+    WhatsApp[WhatsApp API]
+
+    User -->|1. Books Appointment| Portal
+    Portal -->|2. API Request| API
+    API -->|3. Store Data| DB
+    API -->|4. Trigger Confirmation| Agent
+    Agent <-->|5. Voice Call| User
+    Agent -->|6. Sync Result| API
+    API -->|7. Send Confirmation| WhatsApp
+    WhatsApp -->|8. Message| User
+    
+    Scheduler -->|9. Check Pending| DB
+    Scheduler -->|10. 1hr Reminder| WhatsApp
+    Scheduler -->|11. 2hr Reminder| Agent
+```
+
 ## Repository Structure
 
 - **`doctor_booking_agent/`**: The main application code (Frontend + Backend + Agent Logic).
@@ -52,4 +78,16 @@ The following VAD engines are supported for the voice agent:
 
 - **Makefile**: Contains commands to query the call server.
 - **Postman Collection**: [View Documentation](https://documenter.getpostman.com/view/29008927/2sB3dSQUQE)
+
+## Gallery
+
+### Dashboard Views
+| Doctor Dashboard | Admin Panel |
+| ---------------- | ----------- |
+| ![Doctor Dashboard](https://via.placeholder.com/400x200?text=Doctor+Dashboard+Screenshot) | ![Admin Panel](https://via.placeholder.com/400x200?text=Admin+Panel+Screenshot) |
+
+### Communication
+| WhatsApp Confirmation | Follow-up Reminder |
+| --------------------- | ------------------ |
+| ![WhatsApp Confirmation](https://via.placeholder.com/300x400?text=WhatsApp+Confirmation) | ![Follow-up Msg](https://via.placeholder.com/300x400?text=Follow-up+Message) |
 
